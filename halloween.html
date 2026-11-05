@@ -1,0 +1,1542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hallow's Eve — Do Not Read Alone</title>
+<meta name="description" content="Four original ghost stories, whispers in the dark, peeking eyes, and a door you really shouldn't knock on." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+/* ============ BASE ============ */
+:root{
+  --bg:#050208;
+  --ink:#ece6f5;
+  --muted:#a294bd;
+  --orange:#ff8c1a;
+  --orange-deep:#ff5e00;
+  --purple:#7b3fbf;
+  --blood:#b00000;
+  --blood-bright:#ff1a1a;
+  --ghost:#dff1ff;
+  --panel:rgba(28,14,46,.72);
+  --line:rgba(255,140,26,.22);
+  --font-display:'Creepster', 'Impact', fantasy;
+  --font-body:'Crimson Text', Georgia, 'Times New Roman', serif;
+}
+
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, #2a0b22 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 90% 20%, #1a0b2e 0%, transparent 70%),
+    radial-gradient(ellipse 70% 50% at 10% 80%, #26040a 0%, transparent 70%),
+    linear-gradient(180deg, #0b0410 0%, #050208 50%, #020004 100%);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:17px;
+  line-height:1.7;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* pulsing blood-vignette */
+body::before{
+  content:'';
+  position:fixed; inset:-10%; z-index:997; pointer-events:none;
+  background:radial-gradient(ellipse at 50% 100%, rgba(130,0,0,.20), transparent 60%);
+  animation:vignettePulse 7s ease-in-out infinite;
+}
+@keyframes vignettePulse{
+  0%,100%{ opacity:.55; }
+  50%{ opacity:1; }
+}
+
+/* film grain / vignette */
+body::after{
+  content:'';
+  position:fixed; inset:0; z-index:999; pointer-events:none;
+  background:radial-gradient(ellipse at center, transparent 38%, rgba(0,0,0,.68) 100%);
+  mix-blend-mode:multiply;
+}
+
+/* random scare flash */
+body.spook-flash{
+  animation:spookFlash .7s steps(2,end);
+}
+@keyframes spookFlash{
+  0%,100%{ filter:none; transform:none; }
+  15%{ filter:invert(1) hue-rotate(180deg) brightness(.55); transform:translateX(3px); }
+  30%{ filter:none; transform:translateX(-3px); }
+  45%{ filter:contrast(2.5) brightness(.5) saturate(3); transform:translateX(2px); }
+  60%{ filter:none; transform:translateX(-2px); }
+}
+
+a{ color:inherit; text-decoration:none; }
+
+/* ============ SKY SCENE ============ */
+.scene{
+  position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+}
+
+/* blood moon */
+.moon{
+  position:absolute; top:7vh; right:8vw;
+  width:clamp(90px,12vw,160px); aspect-ratio:1;
+  border-radius:50%;
+  background:radial-gradient(circle at 34% 32%, #ffe6e6 0%, #ff8a8a 28%, #c41e1e 62%, #6b0000 100%);
+  box-shadow:
+    0 0 50px 14px rgba(255,40,40,.22),
+    0 0 160px 70px rgba(180,0,0,.16);
+  opacity:.94;
+  animation:moonBreath 10s ease-in-out infinite;
+}
+.moon::after{
+  content:''; position:absolute; inset:0; border-radius:50%;
+  background:
+    radial-gradient(circle at 30% 32%, rgba(70,0,0,.55) 0 11%, transparent 12%),
+    radial-gradient(circle at 63% 24%, rgba(70,0,0,.42) 0 7%, transparent 8%),
+    radial-gradient(circle at 46% 62%, rgba(70,0,0,.5) 0 14%, transparent 15%),
+    radial-gradient(circle at 74% 70%, rgba(70,0,0,.38) 0 8%, transparent 9%),
+    radial-gradient(circle at 22% 70%, rgba(70,0,0,.3) 0 6%, transparent 7%);
+  mix-blend-mode:multiply; opacity:.8;
+}
+@keyframes moonBreath{
+  0%,100%{ filter:brightness(1); }
+  50%{ filter:brightness(1.18) saturate(1.4); }
+}
+
+.stars{ position:absolute; inset:0; }
+.star{
+  position:absolute; width:2px; height:2px; border-radius:50%;
+  background:#fff; opacity:.3;
+  animation:twinkle var(--t,4s) ease-in-out var(--d,0s) infinite;
+}
+@keyframes twinkle{
+  0%,100%{ opacity:.1; transform:scale(.7); }
+  50%{ opacity:.85; transform:scale(1.4); }
+}
+
+.bats{ position:absolute; inset:0; }
+.bat{
+  position:absolute;
+  width:38px;
+  top:var(--top);
+  left:-12vw;
+  opacity:.9;
+  filter:drop-shadow(0 0 6px rgba(255,40,40,.55));
+  animation:fly var(--dur) linear var(--delay) infinite;
+}
+.bat svg{ display:block; width:100%; height:auto; animation:flap .26s ease-in-out infinite alternate; }
+@keyframes flap{ from{ transform:scaleY(1);} to{ transform:scaleY(.6);} }
+@keyframes fly{
+  0%   { transform:translate(0,0) scale(var(--scale)) rotate(0deg); }
+  25%  { transform:translate(32vw,-7vh) scale(var(--scale)) rotate(-5deg); }
+  50%  { transform:translate(64vw,5vh) scale(var(--scale)) rotate(4deg); }
+  75%  { transform:translate(95vw,-6vh) scale(var(--scale)) rotate(-4deg); }
+  100% { transform:translate(130vw,2vh) scale(var(--scale)) rotate(0deg); }
+}
+
+.fog{
+  position:absolute; left:-50%; width:200%; height:60vh; bottom:-12vh;
+  pointer-events:none;
+  filter:blur(46px);
+  animation:drift 70s linear infinite;
+}
+.fog--1{
+  background:
+    radial-gradient(ellipse 40% 60% at 20% 55%, rgba(123,63,191,.24), transparent 65%),
+    radial-gradient(ellipse 35% 55% at 65% 45%, rgba(120,0,0,.15), transparent 65%);
+  animation-duration:80s;
+}
+.fog--2{
+  bottom:-22vh; height:70vh; opacity:.8;
+  background:
+    radial-gradient(ellipse 45% 60% at 50% 60%, rgba(255,40,0,.12), transparent 65%),
+    radial-gradient(ellipse 30% 50% at 85% 50%, rgba(123,63,191,.18), transparent 65%);
+  animation:driftReverse 105s linear infinite;
+}
+.fog--3{
+  bottom:-6vh; height:45vh; opacity:.6;
+  background:radial-gradient(ellipse 50% 60% at 35% 55%, rgba(180,200,255,.10), transparent 70%);
+  animation-duration:130s;
+}
+@keyframes drift{
+  0%{ transform:translateX(-15%); }
+  100%{ transform:translateX(15%); }
+}
+@keyframes driftReverse{
+  0%{ transform:translateX(15%); }
+  100%{ transform:translateX(-15%); }
+}
+
+/* peeking eyes in the dark */
+.peek-eyes{
+  position:fixed; inset:0; z-index:2; pointer-events:none; overflow:hidden;
+}
+.peek-eye{
+  position:absolute;
+  width:34px; height:12px;
+  opacity:0;
+  filter:drop-shadow(0 0 8px rgba(255,0,0,.95));
+  animation:peek var(--dur,14s) infinite var(--delay,0s);
+}
+.peek-eye::before,
+.peek-eye::after{
+  content:'';
+  position:absolute; top:0;
+  width:9px; height:12px;
+  border-radius:50%;
+  background:radial-gradient(circle at 50% 40%, #fff 0 15%, #ff4d4d 40%, #6b0000 100%);
+  box-shadow:0 0 12px 3px rgba(255,0,0,.8);
+}
+.peek-eye::before{ left:0; }
+.peek-eye::after{ right:0; }
+@keyframes peek{
+  0%,84%,100%{ opacity:0; transform:translateY(8px) scale(.9); }
+  88%,92%{ opacity:.9; transform:translateY(0) scale(1); }
+}
+
+/* cobwebs */
+.cobweb{
+  position:fixed; top:0; width:clamp(120px,18vw,230px);
+  z-index:2; pointer-events:none; opacity:.18;
+}
+.cobweb--tl{ left:0; }
+.cobweb--tr{ right:0; transform:scaleX(-1); }
+.cobweb svg{ display:block; width:100%; height:auto; }
+
+/* creeping shadow hands */
+.shadow-hand{
+  position:fixed; bottom:-10px;
+  width:clamp(120px,18vw,220px);
+  z-index:2; pointer-events:none;
+  opacity:.18;
+  filter:drop-shadow(0 0 24px rgba(160,0,0,.65));
+  animation:creep 9s ease-in-out infinite;
+}
+.shadow-hand--left{ left:-20px; transform-origin:bottom left; }
+.shadow-hand--right{ right:-20px; transform-origin:bottom right; animation-name:creepRight; animation-delay:-4s; }
+@keyframes creep{
+  0%,100%{ transform:translateY(30%) rotate(-4deg); }
+  50%{ transform:translateY(6%) rotate(2deg); }
+}
+@keyframes creepRight{
+  0%,100%{ transform:scaleX(-1) translateY(30%) rotate(4deg); }
+  50%{ transform:scaleX(-1) translateY(6%) rotate(-2deg); }
+}
+
+/* ============ LAYOUT ============ */
+main{ position:relative; z-index:1; }
+
+.section{
+  padding:clamp(64px,10vh,120px) clamp(18px,5vw,60px);
+  max-width:1200px;
+  margin:0 auto;
+}
+
+.section-title{
+  position:relative;
+  font-family:var(--font-display);
+  font-weight:400;
+  font-size:clamp(2.1rem,6vw,3.9rem);
+  letter-spacing:2px;
+  text-align:center;
+  margin:0 0 10px;
+  color:#ff6a6a;
+  text-shadow:
+    0 0 14px rgba(255,20,20,.75),
+    0 0 46px rgba(180,0,0,.45),
+    0 2px 0 rgba(0,0,0,.7);
+}
+
+/* blood drips under section titles */
+.section-title::after{
+  content:'';
+  display:block;
+  width:min(260px,62%);
+  height:32px;
+  margin:10px auto 0;
+  background:
+    radial-gradient(ellipse 7px 18px at 10% 0, var(--blood) 0 70%, transparent 71%),
+    radial-gradient(ellipse 5px 26px at 22% 0, var(--blood) 0 70%, transparent 71%),
+    radial-gradient(ellipse 9px 12px at 38% 0, var(--blood) 0 70%, transparent 71%),
+    radial-gradient(ellipse 5px 22px at 54% 0, var(--blood) 0 70%, transparent 71%),
+    radial-gradient(ellipse 8px 30px at 70% 0, var(--blood) 0 70%, transparent 71%),
+    radial-gradient(ellipse 4px 16px at 86% 0, var(--blood) 0 70%, transparent 71%);
+  background-repeat:no-repeat;
+  filter:drop-shadow(0 0 8px rgba(200,0,0,.85));
+  opacity:.85;
+  animation:dripPulse 4s ease-in-out infinite;
+}
+@keyframes dripPulse{
+  0%,100%{ opacity:.65; transform:scaleY(.92); }
+  50%{ opacity:1; transform:scaleY(1.06); }
+}
+
+.section-sub{
+  text-align:center;
+  color:var(--muted);
+  font-style:italic;
+  font-size:1.05rem;
+  max-width:620px;
+  margin:0 auto clamp(36px,6vw,60px);
+}
+
+/* ============ NAV ============ */
+.nav{
+  position:sticky; top:0; z-index:60;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:16px;
+  padding:12px clamp(16px,4vw,44px);
+  background:linear-gradient(180deg, rgba(6,3,13,.94), rgba(6,3,13,.50));
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(180,0,0,.26);
+}
+.nav__logo{
+  font-family:var(--font-display);
+  font-size:1.35rem;
+  letter-spacing:1.5px;
+  color:#ff6a6a;
+  text-shadow:0 0 16px rgba(255,20,20,.8);
+  white-space:nowrap;
+}
+.nav__links{ display:flex; gap:clamp(12px,2.5vw,28px); }
+.nav__links a{
+  font-size:.95rem;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--muted);
+  transition:color .25s, text-shadow .25s;
+  padding:6px 2px;
+  border-bottom:1px solid transparent;
+}
+.nav__links a:hover{
+  color:#ff6a6a;
+  text-shadow:0 0 12px rgba(255,20,20,.85);
+  border-bottom-color:rgba(180,0,0,.7);
+}
+.sound-btn{
+  font-family:var(--font-body);
+  font-size:.85rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--muted);
+  background:rgba(180,0,0,.08);
+  border:1px solid rgba(180,0,0,.35);
+  border-radius:999px;
+  padding:7px 14px;
+  cursor:pointer;
+  transition:.25s;
+  white-space:nowrap;
+}
+.sound-btn:hover{
+  color:#ffb3b3;
+  border-color:rgba(255,20,20,.8);
+  box-shadow:0 0 24px rgba(180,0,0,.45);
+}
+.sound-btn.on{
+  color:#0b0616;
+  background:#ff6a6a;
+  border-color:#ff6a6a;
+  box-shadow:0 0 28px rgba(255,20,20,.65);
+}
+
+/* ============ HERO ============ */
+.hero{
+  position:relative;
+  min-height:calc(100vh - 62px);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  text-align:center;
+  padding:clamp(40px,8vh,90px) 20px clamp(60px,10vh,110px);
+  overflow:hidden;
+}
+.hero__kicker{
+  font-size:.85rem;
+  letter-spacing:.55em;
+  text-transform:uppercase;
+  color:#ff3d3d;
+  opacity:.9;
+  margin:0 0 18px;
+  text-shadow:0 0 22px rgba(255,0,0,.85);
+  animation:kickerPulse 3.2s ease-in-out infinite;
+}
+@keyframes kickerPulse{
+  0%,100%{ opacity:.45; transform:skewX(-2deg); }
+  50%{ opacity:1; transform:skewX(2deg); }
+}
+
+.hero__title{
+  position:relative;
+  font-family:var(--font-display);
+  font-weight:400;
+  font-size:clamp(3.2rem,15vw,10.5rem);
+  line-height:.92;
+  letter-spacing:clamp(2px,1vw,8px);
+  margin:0 0 22px;
+  color:#ff3d00;
+  animation:flicker 5s infinite;
+}
+.hero__title span{
+  color:#ff1a1a;
+  text-shadow:0 0 34px rgba(255,0,0,.95);
+}
+@keyframes flicker{
+  0%,18%,22%,24%,26%,54%,56%,100%{
+    text-shadow:
+      0 0 12px rgba(255,20,20,.95),
+      0 0 42px rgba(180,0,0,.75),
+      0 0 110px rgba(255,0,0,.40);
+    opacity:1;
+    transform:skewX(0deg);
+  }
+  20%,25%,55%{
+    text-shadow:none;
+    opacity:.35;
+    transform:skewX(1.4deg);
+  }
+  57%{
+    text-shadow:0 0 30px #ff0000;
+    opacity:1;
+    transform:skewX(-1deg);
+  }
+}
+
+.hero__sub{
+  max-width:560px;
+  font-size:clamp(1rem,2.2vw,1.2rem);
+  color:#b9a8d6;
+  font-style:italic;
+  margin:0 0 36px;
+}
+
+.hero__btns{ display:flex; flex-wrap:wrap; gap:16px; justify-content:center; }
+
+.btn{
+  font-family:var(--font-body);
+  font-size:1rem;
+  letter-spacing:.08em;
+  padding:14px 30px;
+  border-radius:999px;
+  cursor:pointer;
+  border:1px solid transparent;
+  transition:transform .25s, box-shadow .25s, background .25s, color .25s, border-color .25s;
+  display:inline-block;
+}
+.btn--primary{
+  background:linear-gradient(135deg, #ff5e00, #b00000);
+  color:#14060a;
+  font-weight:600;
+  box-shadow:0 10px 38px -10px rgba(255,20,0,.95), inset 0 1px 0 rgba(255,255,255,.35);
+}
+.btn--primary:hover{
+  transform:translateY(-3px);
+  box-shadow:0 16px 50px -10px rgba(255,0,0,1), inset 0 1px 0 rgba(255,255,255,.45);
+}
+.btn--ghost{
+  background:rgba(123,63,191,.10);
+  color:#e2d0ff;
+  border-color:rgba(190,80,255,.4);
+}
+.btn--ghost:hover{
+  transform:translateY(-3px);
+  background:rgba(123,63,191,.24);
+  border-color:rgba(220,120,255,.9);
+  box-shadow:0 0 32px rgba(190,0,255,.42);
+}
+
+/* floating ghosts */
+.ghost{
+  position:absolute;
+  pointer-events:none;
+  filter:drop-shadow(0 0 22px rgba(160,220,255,.65));
+  opacity:.88;
+}
+.ghost--1{ width:clamp(52px,7vw,84px); left:6%;  top:26%;  animation:floaty 8s ease-in-out infinite; }
+.ghost--2{ width:clamp(64px,9vw,112px); right:9%; top:20%; animation:floaty 11s ease-in-out -3s infinite; opacity:.7; }
+.ghost--3{ width:clamp(40px,5vw,64px); left:20%; bottom:14%; animation:floaty 9.5s ease-in-out -5s infinite; opacity:.55; }
+.ghost--4{ width:clamp(44px,6vw,72px); right:22%; bottom:20%; animation:floaty 12s ease-in-out -1.5s infinite; opacity:.5; }
+
+@keyframes floaty{
+  0%,100%{ transform:translate(0,0) rotate(-2deg); }
+  25%    { transform:translate(12px,-22px) rotate(2deg); }
+  50%    { transform:translate(-8px,-38px) rotate(-3deg); }
+  75%    { transform:translate(-16px,-14px) rotate(1deg); }
+}
+
+/* pumpkin */
+.pumpkin{
+  margin-top:clamp(28px,5vh,50px);
+  width:clamp(84px,11vw,128px);
+  animation:bob 5s ease-in-out infinite;
+  filter:drop-shadow(0 0 38px rgba(255,40,0,.65));
+}
+@keyframes bob{
+  0%,100%{ transform:translateY(0) rotate(-1.5deg); }
+  50%    { transform:translateY(-14px) rotate(1.5deg); }
+}
+
+/* ============ STORY CARDS ============ */
+.story-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(258px,1fr));
+  gap:clamp(18px,3vw,28px);
+}
+
+.card{
+  position:relative;
+  padding:28px 26px 24px;
+  border-radius:20px;
+  background:linear-gradient(160deg, rgba(52,18,64,.88), rgba(10,2,16,.96));
+  border:1px solid var(--line);
+  cursor:pointer;
+  overflow:hidden;
+  transition:transform .35s cubic-bezier(.2,.8,.3,1), border-color .35s, box-shadow .35s;
+}
+.card::before{
+  content:'';
+  position:absolute; inset:-2px;
+  background:radial-gradient(circle at 50% 0%, rgba(180,0,0,.28), transparent 65%);
+  opacity:0; transition:opacity .35s;
+  pointer-events:none;
+}
+.card:hover{
+  transform:translateY(-8px);
+  border-color:rgba(255,20,20,.75);
+  box-shadow:0 28px 70px -26px rgba(180,0,0,.8), inset 0 0 44px rgba(180,0,0,.08);
+}
+.card:hover::before{ opacity:1; }
+
+.card__icon{
+  font-size:2.3rem;
+  display:block;
+  margin-bottom:14px;
+  filter:drop-shadow(0 0 18px rgba(255,20,20,.7));
+  transition:transform .35s;
+}
+.card:hover .card__icon{ transform:scale(1.18) rotate(-6deg); }
+
+.card__tag{
+  font-size:.72rem;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:#ff6a6a;
+  margin:0 0 8px;
+  opacity:.95;
+}
+.card__title{
+  font-family:var(--font-display);
+  font-weight:400;
+  font-size:1.5rem;
+  line-height:1.15;
+  letter-spacing:.5px;
+  margin:0 0 12px;
+  color:#f3e9ff;
+  text-shadow:0 0 22px rgba(190,40,255,.45);
+}
+.card__teaser{
+  color:var(--muted);
+  font-size:.98rem;
+  margin:0 0 20px;
+}
+.card__cta{
+  font-size:.82rem;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:#ff8c8c;
+  display:inline-block;
+  transition:letter-spacing .3s, color .3s;
+}
+.card:hover .card__cta{ letter-spacing:.26em; color:#ffb3b3; }
+
+/* ============ WHISPERS ============ */
+.whispers{ text-align:center; }
+
+.whisper-box{
+  max-width:760px;
+  margin:0 auto;
+  padding:clamp(30px,5vw,56px) clamp(22px,4vw,48px);
+  border-radius:22px;
+  border:1px solid rgba(180,0,0,.35);
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(123,63,191,.24), transparent 70%),
+    radial-gradient(ellipse at 50% 100%, rgba(180,0,0,.12), transparent 70%),
+    rgba(8,2,14,.76);
+  box-shadow:inset 0 0 90px rgba(180,0,0,.16), 0 30px 80px -40px rgba(180,0,0,.8);
+}
+
+.whisper-text{
+  font-size:clamp(1.15rem,2.6vw,1.6rem);
+  font-style:italic;
+  line-height:1.55;
+  color:#eadfff;
+  margin:0 0 30px;
+  min-height:3.4em;
+  display:flex; align-items:center; justify-content:center;
+  text-shadow:0 0 26px rgba(255,20,20,.65);
+}
+.whisper-text.speaking{ animation:whisperIn .9s ease; }
+@keyframes whisperIn{
+  0%{ opacity:0; filter:blur(8px); transform:translateY(10px) scale(.97); letter-spacing:.3em; }
+  60%{ opacity:.5; filter:blur(2px); }
+  100%{ opacity:1; filter:blur(0); transform:none; letter-spacing:normal; }
+}
+
+/* ============ DOOR ============ */
+.ritual{ text-align:center; }
+
+.door-stage{
+  display:flex; flex-direction:column; align-items:center; gap:26px;
+}
+
+.door-frame{
+  position:relative;
+  width:clamp(160px,26vw,210px);
+  aspect-ratio:2/2.9;
+  perspective:1000px;
+  cursor:pointer;
+  border-radius:8px 8px 0 0;
+  box-shadow:
+    0 0 0 10px #180a26,
+    0 0 0 12px rgba(180,0,0,.30),
+    0 40px 70px -30px rgba(180,0,0,.65);
+  transition:box-shadow .5s;
+}
+.door-frame:hover{
+  box-shadow:
+    0 0 0 10px #180a26,
+    0 0 0 12px rgba(255,20,20,.65),
+    0 40px 100px -30px rgba(255,0,0,.95);
+}
+
+.door__beyond{
+  position:absolute; inset:0;
+  background:radial-gradient(ellipse at 50% 60%, #1a0000 0%, #000 75%);
+  border-radius:6px 6px 0 0;
+  display:grid; place-items:center; gap:0;
+  overflow:hidden;
+}
+.door__eyes{
+  display:flex; gap:26px;
+  animation:blink 5s infinite;
+}
+.eye{
+  width:16px; height:22px;
+  border-radius:50%;
+  background:radial-gradient(circle at 50% 50%, #fff3c4 0%, #ff1a00 45%, #6b0000 100%);
+  box-shadow:0 0 18px 6px rgba(255,0,0,.95), 0 0 54px 18px rgba(180,0,0,.45);
+}
+@keyframes blink{
+  0%,92%,100%{ transform:scaleY(1); }
+  95%{ transform:scaleY(.05); }
+}
+.door__msg{
+  position:absolute; bottom:16px; left:0; right:0;
+  font-family:var(--font-display);
+  font-size:1rem;
+  letter-spacing:1.5px;
+  color:#ff1a1a;
+  text-shadow:0 0 18px rgba(255,0,0,1);
+  opacity:0; transition:opacity .6s .8s;
+  margin:0;
+  padding:0 8px;
+}
+.door-frame.open .door__msg{ opacity:1; }
+
+.door__leaf{
+  position:absolute; inset:0;
+  transform-origin:left center;
+  transition:transform 1.6s cubic-bezier(.5,.05,.2,1);
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.55), transparent 18%, transparent 82%, rgba(0,0,0,.6)),
+    repeating-linear-gradient(90deg, #32140d 0 14px, #2a100a 14px 28px, #3a1710 28px 42px);
+  border-radius:6px 6px 0 0;
+  border:1px solid rgba(180,0,0,.28);
+  box-shadow:inset 0 0 70px rgba(0,0,0,.8);
+}
+.door__leaf::after{
+  content:'';
+  position:absolute; inset:14px;
+  border:1px solid rgba(255,80,50,.14);
+  border-radius:4px;
+  box-shadow:inset 0 0 34px rgba(0,0,0,.7);
+}
+.door__knob{
+  position:absolute; right:16px; top:50%;
+  width:14px; height:14px; margin-top:-7px;
+  border-radius:50%;
+  background:radial-gradient(circle at 34% 30%, #ffd0d0, #b82b2b 60%, #4a0000);
+  box-shadow:0 0 18px rgba(255,40,40,.85);
+}
+.door-frame.open .door__leaf{ transform:rotateY(-108deg); }
+
+.door__leaf.shake{ animation:knockShake .5s ease; }
+@keyframes knockShake{
+  0%,100%{ transform:translateX(0) rotate(0); }
+  15%{ transform:translateX(-7px) rotate(-1.2deg); }
+  35%{ transform:translateX(6px) rotate(1deg); }
+  55%{ transform:translateX(-5px) rotate(-.8deg); }
+  75%{ transform:translateX(4px) rotate(.5deg); }
+}
+
+.door-hint{
+  font-size:.82rem;
+  letter-spacing:.3em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin:0;
+  transition:color .4s;
+}
+.door-hint.done{
+  color:#ff1a1a;
+  text-shadow:0 0 22px rgba(255,0,0,.95);
+}
+
+/* ============ FOOTER ============ */
+.footer{
+  position:relative; z-index:1;
+  text-align:center;
+  padding:60px 20px 70px;
+  border-top:1px solid rgba(180,0,0,.18);
+  color:#736393;
+  font-size:.9rem;
+}
+.footer p{ margin:6px 0; }
+.footer .candle{
+  font-size:1.4rem; display:block; margin-bottom:12px;
+  animation:flickerSoft 3s infinite;
+}
+@keyframes flickerSoft{
+  0%,100%{ opacity:.85; }
+  45%{ opacity:.25; }
+  60%{ opacity:1; }
+}
+
+/* ============ MODAL ============ */
+.modal{
+  position:fixed; inset:0; z-index:200;
+  display:none;
+  place-items:center;
+  padding:20px;
+  background:rgba(2,0,4,.92);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+.modal.open{ display:grid; animation:modalFade .3s ease; }
+@keyframes modalFade{ from{ opacity:0 } to{ opacity:1 } }
+
+.modal__box{
+  position:relative;
+  width:min(720px,100%);
+  max-height:86vh;
+  overflow-y:auto;
+  padding:clamp(26px,4.5vw,52px);
+  border-radius:22px;
+  border:1px solid rgba(255,20,20,.42);
+  background:linear-gradient(165deg, #220a26 0%, #07010d 65%);
+  box-shadow:
+    0 0 0 1px rgba(255,20,20,.10),
+    0 50px 120px -35px rgba(180,0,0,.65),
+    inset 0 0 120px rgba(123,63,191,.18);
+  animation:modalRise .45s cubic-bezier(.2,.9,.3,1);
+}
+.modal__box::before{
+  content:'';
+  position:absolute; inset:0;
+  pointer-events:none;
+  border-radius:22px;
+  background:repeating-linear-gradient(115deg, transparent 0 38px, rgba(255,0,0,.035) 39px 40px, transparent 41px 76px);
+  opacity:.8;
+}
+@keyframes modalRise{
+  from{ opacity:0; transform:translateY(28px) scale(.97); }
+  to{ opacity:1; transform:none; }
+}
+.modal__box::-webkit-scrollbar{ width:10px; }
+.modal__box::-webkit-scrollbar-track{ background:rgba(255,255,255,.04); border-radius:10px; }
+.modal__box::-webkit-scrollbar-thumb{ background:rgba(180,0,0,.55); border-radius:10px; }
+.modal__box::-webkit-scrollbar-thumb:hover{ background:rgba(255,20,20,.85); }
+
+.modal__close{
+  position:absolute; top:14px; right:14px;
+  width:38px; height:38px;
+  border-radius:50%;
+  border:1px solid rgba(255,20,20,.45);
+  background:rgba(180,0,0,.12);
+  color:#ff8c8c;
+  font-size:1rem;
+  cursor:pointer;
+  transition:.25s;
+  line-height:1;
+}
+.modal__close:hover{
+  background:#ff1a1a;
+  color:#0b0616;
+  box-shadow:0 0 28px rgba(255,0,0,.9);
+  transform:rotate(90deg);
+}
+
+.modal__title{
+  position:relative;
+  font-family:var(--font-display);
+  font-weight:400;
+  font-size:clamp(1.8rem,4.5vw,2.7rem);
+  line-height:1.1;
+  letter-spacing:1px;
+  margin:6px 0 26px;
+  color:#ff8c8c;
+  text-shadow:0 0 28px rgba(255,20,20,.8);
+  padding-right:40px;
+}
+
+.story__body p{
+  margin:0 0 1.15em;
+  color:#e0d5f2;
+  font-size:1.06rem;
+  line-height:1.78;
+}
+.story__body p:first-of-type::first-letter{
+  float:left;
+  font-family:var(--font-display);
+  font-size:3.4em;
+  line-height:.82;
+  padding:6px 12px 0 0;
+  color:#ff1a1a;
+  text-shadow:0 0 26px rgba(255,0,0,.95);
+}
+.story__body em{ color:#e0b3ff; }
+
+/* ============ SPOOK TOAST ============ */
+.spook-toast{
+  position:fixed;
+  left:50%; bottom:28px;
+  transform:translate(-50%,20px);
+  z-index:600;
+  max-width:min(92vw,560px);
+  padding:14px 22px;
+  border-radius:12px;
+  border:1px solid rgba(255,20,20,.65);
+  background:rgba(8,0,6,.94);
+  color:#ffb3b3;
+  font-family:var(--font-display);
+  letter-spacing:1px;
+  font-size:1.05rem;
+  text-align:center;
+  opacity:0;
+  pointer-events:none;
+  box-shadow:0 0 44px rgba(180,0,0,.6);
+  transition:opacity .4s, transform .4s;
+}
+.spook-toast.show{
+  opacity:1;
+  transform:translate(-50%,0);
+}
+
+/* ============ REVEAL ============ */
+.reveal{
+  opacity:0;
+  transform:translateY(34px);
+  transition:opacity .9s ease, transform .9s cubic-bezier(.2,.8,.3,1);
+}
+.reveal.visible{ opacity:1; transform:none; }
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:720px){
+  .nav__links{ display:none; }
+  .ghost--3, .ghost--4{ display:none; }
+  .moon{ top:4vh; right:5vw; opacity:.72; }
+  .shadow-hand{ opacity:.10; }
+  body{ font-size:16px; }
+  .hero{ min-height:auto; padding-top:70px; }
+}
+@media (max-width:420px){
+  .ghost--2{ opacity:.4; }
+  .sound-btn{ padding:6px 10px; font-size:.72rem; }
+  .cobweb{ opacity:.1; }
+}
+@media (prefers-reduced-motion:reduce){
+  *, *::before, *::after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
+    scroll-behavior:auto !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== ATMOSPHERE ===== -->
+<div class="scene" aria-hidden="true">
+  <div class="stars" id="stars"></div>
+  <div class="moon"></div>
+  <div class="bats" id="bats"></div>
+  <div class="fog fog--1"></div>
+  <div class="fog fog--2"></div>
+  <div class="fog fog--3"></div>
+</div>
+
+<!-- peeking eyes -->
+<div class="peek-eyes" id="peekEyes" aria-hidden="true"></div>
+
+<!-- cobwebs -->
+<div class="cobweb cobweb--tl" aria-hidden="true">
+  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <g fill="none" stroke="rgba(220,200,240,.55)" stroke-width="1">
+      <path d="M0 0 L200 200 M0 0 L160 30 M0 0 L120 70 M0 0 L70 120 M0 0 L30 160" />
+      <path d="M0 40 Q40 40 40 0" />
+      <path d="M0 80 Q80 80 80 0" />
+      <path d="M0 120 Q120 120 120 0" />
+      <path d="M0 160 Q160 160 160 0" />
+    </g>
+  </svg>
+</div>
+<div class="cobweb cobweb--tr" aria-hidden="true">
+  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <g fill="none" stroke="rgba(220,200,240,.55)" stroke-width="1">
+      <path d="M0 0 L200 200 M0 0 L160 30 M0 0 L120 70 M0 0 L70 120 M0 0 L30 160" />
+      <path d="M0 40 Q40 40 40 0" />
+      <path d="M0 80 Q80 80 80 0" />
+      <path d="M0 120 Q120 120 120 0" />
+      <path d="M0 160 Q160 160 160 0" />
+    </g>
+  </svg>
+</div>
+
+<!-- creeping shadow hands -->
+<div class="shadow-hand shadow-hand--left" aria-hidden="true">
+  <svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20 132 C10 104 4 82 8 56 C9 48 16 44 20 52 L28 74 L24 40 C23 30 34 26 37 36 L42 70 L42 32 C42 22 54 22 54 32 L54 72 L58 40 C58 30 70 30 70 40 L68 76 L74 54 C76 46 86 48 84 58 L78 90 C76 110 68 126 54 132 Z" fill="rgba(110,0,0,.55)"/>
+  </svg>
+</div>
+<div class="shadow-hand shadow-hand--right" aria-hidden="true">
+  <svg viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20 132 C10 104 4 82 8 56 C9 48 16 44 20 52 L28 74 L24 40 C23 30 34 26 37 36 L42 70 L42 32 C42 22 54 22 54 32 L54 72 L58 40 C58 30 70 30 70 40 L68 76 L74 54 C76 46 86 48 84 58 L78 90 C76 110 68 126 54 132 Z" fill="rgba(110,0,0,.55)"/>
+  </svg>
+</div>
+
+<!-- ===== NAV ===== -->
+<nav class="nav">
+  <span class="nav__logo">🎃 Hallow's Eve</span>
+  <div class="nav__links">
+    <a href="#stories">Stories</a>
+    <a href="#whispers">Whispers</a>
+    <a href="#ritual">The Door</a>
+  </div>
+  <button class="sound-btn" id="soundToggle" aria-pressed="false">🔇 Ambience</button>
+</nav>
+
+<main>
+
+  <!-- ===== HERO ===== -->
+  <header class="hero">
+    <svg class="ghost ghost--1" viewBox="0 0 100 120" aria-hidden="true">
+      <path d="M50 4C26 4 8 24 8 50v62l14-12 14 12 14-12 14 12 14-12 14 12V50C92 24 74 4 50 4Z" fill="#e6f3ff"/>
+      <circle cx="36" cy="47" r="6.5" fill="#1b0f2e"/>
+      <circle cx="64" cy="47" r="6.5" fill="#1b0f2e"/>
+      <ellipse cx="50" cy="69" rx="7" ry="9" fill="#1b0f2e" opacity=".8"/>
+    </svg>
+    <svg class="ghost ghost--2" viewBox="0 0 100 120" aria-hidden="true">
+      <path d="M50 4C26 4 8 24 8 50v62l14-12 14 12 14-12 14 12 14-12 14 12V50C92 24 74 4 50 4Z" fill="#d8ecff"/>
+      <circle cx="36" cy="47" r="6.5" fill="#1b0f2e"/>
+      <circle cx="64" cy="47" r="6.5" fill="#1b0f2e"/>
+      <ellipse cx="50" cy="69" rx="7" ry="9" fill="#1b0f2e" opacity=".8"/>
+    </svg>
+    <svg class="ghost ghost--3" viewBox="0 0 100 120" aria-hidden="true">
+      <path d="M50 4C26 4 8 24 8 50v62l14-12 14 12 14-12 14 12 14-12 14 12V50C92 24 74 4 50 4Z" fill="#e6f3ff"/>
+      <circle cx="36" cy="47" r="6.5" fill="#1b0f2e"/>
+      <circle cx="64" cy="47" r="6.5" fill="#1b0f2e"/>
+      <ellipse cx="50" cy="69" rx="7" ry="9" fill="#1b0f2e" opacity=".8"/>
+    </svg>
+    <svg class="ghost ghost--4" viewBox="0 0 100 120" aria-hidden="true">
+      <path d="M50 4C26 4 8 24 8 50v62l14-12 14 12 14-12 14 12 14-12 14 12V50C92 24 74 4 50 4Z" fill="#d8ecff"/>
+      <circle cx="36" cy="47" r="6.5" fill="#1b0f2e"/>
+      <circle cx="64" cy="47" r="6.5" fill="#1b0f2e"/>
+      <ellipse cx="50" cy="69" rx="7" ry="9" fill="#1b0f2e" opacity=".8"/>
+    </svg>
+
+    <p class="hero__kicker">Do not look behind you</p>
+    <h1 class="hero__title">HALLOW<span>EEN</span></h1>
+    <p class="hero__sub">Four true tales from the wrong side of midnight. Read them with the lights on — or don't. It's more fun if you don't.</p>
+
+    <div class="hero__btns">
+      <a href="#stories" class="btn btn--primary">Read the Ghost Stories</a>
+      <a href="#whispers" class="btn btn--ghost">Hear a Whisper</a>
+    </div>
+
+    <svg class="pumpkin" viewBox="0 0 200 180" aria-hidden="true">
+      <defs>
+        <radialGradient id="pg" cx="38%" cy="30%">
+          <stop offset="0%" stop-color="#ffb26b"/>
+          <stop offset="60%" stop-color="#d94a12"/>
+          <stop offset="100%" stop-color="#8b1c00"/>
+        </radialGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="4" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <path d="M100 40c-6-16 4-26 16-29-8 9 2 15 2 23 0 8-10 12-18 6Z" fill="#3f6b22"/>
+      <ellipse cx="100" cy="105" rx="86" ry="68" fill="url(#pg)"/>
+      <ellipse cx="56" cy="105" rx="26" ry="64" fill="#b3380c" opacity=".48"/>
+      <ellipse cx="144" cy="105" rx="26" ry="64" fill="#b3380c" opacity=".48"/>
+      <g fill="#ffd24a" filter="url(#glow)">
+        <path d="M62 92 L82 92 L72 74 Z"/>
+        <path d="M138 92 L118 92 L128 74 Z"/>
+        <path d="M74 118 L88 108 L100 120 L112 108 L126 118 L120 132 L80 132 Z"/>
+      </g>
+    </svg>
+  </header>
+
+  <!-- ===== STORIES ===== -->
+  <section class="section" id="stories">
+    <h2 class="section-title" data-reveal>The Stories</h2>
+    <p class="section-sub" data-reveal>Each one is true, in the way that matters. Click a card to open the tale — if you're sure.</p>
+    <div class="story-grid" id="storyGrid"></div>
+  </section>
+
+  <!-- ===== WHISPERS ===== -->
+  <section class="section whispers" id="whispers">
+    <h2 class="section-title" data-reveal>Whispers in the Dark</h2>
+    <p class="section-sub" data-reveal>Things the house says when it thinks you aren't listening.</p>
+    <div class="whisper-box" data-reveal>
+      <p class="whisper-text" id="whisperText">The walls have been counting your footsteps.</p>
+      <button class="btn btn--ghost" id="whisperBtn">Summon another whisper</button>
+    </div>
+  </section>
+
+  <!-- ===== DOOR ===== -->
+  <section class="section ritual" id="ritual">
+    <h2 class="section-title" data-reveal>Knock Three Times</h2>
+    <p class="section-sub" data-reveal>They say the door only opens for the curious. They say a lot of things about the curious.</p>
+
+    <div class="door-stage">
+      <div class="door-frame" id="doorFrame" role="button" tabindex="0" aria-label="Knock on the door">
+        <div class="door__beyond">
+          <div class="door__eyes"><span class="eye"></span><span class="eye"></span></div>
+          <p class="door__msg">You shouldn't have.</p>
+        </div>
+        <div class="door__leaf" id="doorLeaf">
+          <div class="door__knob"></div>
+        </div>
+      </div>
+      <p class="door-hint" id="doorHint">Knock (0 / 3)</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <span class="candle" aria-hidden="true">🕯️</span>
+  <p>Hallow's Eve — four stories, told in the dark.</p>
+  <p>No ghosts were harmed in the making of this website. Some were inconvenienced.</p>
+</footer>
+
+<!-- ===== MODAL ===== -->
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal__box">
+    <button class="modal__close" id="modalClose" aria-label="Close story">✕</button>
+    <p class="card__tag" id="modalTag"></p>
+    <h2 class="modal__title" id="modalTitle"></h2>
+    <div class="story__body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- ===== SPOOK TOAST ===== -->
+<div class="spook-toast" id="spookToast" role="status" aria-live="polite"></div>
+
+<script>
+/* ============================================================
+   STORY DATA
+   ============================================================ */
+const stories = [
+  {
+    icon: '🏚️',
+    tag: 'Haunted House · 4 min',
+    title: 'The Hollow House on Miller Lane',
+    teaser: 'Every morning, a child-sized handprint on the inside of the window. Every morning, a little higher.',
+    body: `
+      <p>The house on Miller Lane sold for eleven thousand dollars, and Dana knew exactly why.</p>
+      <p>She was a flipper. She'd gutted worse. The listing said <em>charming Victorian, needs TLC</em>, and the TLC turned out to be a single upstairs window that would not stay clean. Every morning, a smudge of a hand — small, child-sized, four fingers and a thumb — pressed against the glass from the inside.</p>
+      <p>She scrubbed it. It came back the next morning, a little higher on the pane.</p>
+      <p>By the third week there were two handprints. By the fifth, a dozen, climbing the window like someone was trying to get out. Dana stopped going upstairs. She told herself it was condensation. Old glass. Humidity.</p>
+      <p>Then the wallpaper in the nursery began to blister. She peeled a corner back to see what was underneath, and the plaster beneath was covered in handprints — dozens of them, pressed into the plaster as though the wall had still been soft when they were made. They were not on the surface. They were <em>in</em> it, like fossils of a panic.</p>
+      <p>All of them faced the same way. All of them were reaching for the window.</p>
+      <p>Dana called a contractor, then a priest, and finally a woman who didn't ask questions and charged in cash. The woman walked the house once, stopped in the nursery, and said, "Whatever was in here got out a long time ago. These aren't the ones who were kept in. These are the ones who came to get her out and didn't manage it."</p>
+      <p>"Her?" Dana said.</p>
+      <p>"The little one in the walls. She's been in there since 1911. Every night she scratches where the wallpaper meets the ceiling, and every night forty-one people who loved her try to reach her through the plaster."</p>
+      <p>Dana sold the house in the spring. The new owners say the handprints are still there.</p>
+      <p>There's a new one, too — up high, at the height of a grown woman, on the inside of the nursery window.</p>
+      <p>It faces out.</p>
+    `
+  },
+  {
+    icon: '🚂',
+    tag: 'Ghost Train · 5 min',
+    title: 'The Last Train to Nowhere',
+    teaser: 'The 1:13 to Ashbury was empty except for me and the woman in the grey coat. It never stopped at my station.',
+    body: `
+      <p>The 1:13 to Ashbury was empty except for me and the woman in the grey coat.</p>
+      <p>I'd taken that train a hundred times. I knew the rhythm of it — the long curve past the reservoir, the clatter over the junction, the way the lights dipped just before my stop. That night, none of it came. The carriage ran smooth as a held breath.</p>
+      <p>The woman in the grey coat sat across the aisle with her hands folded and watched the window. After a while she said, without turning, "Which stop?"</p>
+      <p>"Ashbury," I said.</p>
+      <p>She nodded slowly. "I used to get off at Ashbury."</p>
+      <p>We passed it at 1:41. I saw the sign slide by, lit and empty, and no one pulled the cord. I pulled it myself. Nothing happened. I walked the length of the train and found no conductor, no driver, no door that would open. Every window showed the same black rushing past, and in every window, the reflection of the woman in the grey coat, sitting patiently behind me.</p>
+      <p>At some point — hours, or years — the conductor came through. He was very polite. He punched my ticket and looked at it for a long moment.</p>
+      <p>"You've been riding a while, sir," he said.</p>
+      <p>"How long?"</p>
+      <p>He told me. Thirty-one years.</p>
+      <p>"You can sit down," he said. "It's easier if you sit down."</p>
+      <p>The next time the train slowed, the woman in the grey coat stood up. She smoothed her coat, walked to the door, and it opened for her — just like that, as though it had always been that simple. On the platform she turned back and looked at me through the glass, and she mouthed something I couldn't hear, and then she was gone and the train was moving and I understood, all at once, what she'd been trying to say.</p>
+      <p>She had been sitting in my seat for thirty-one years, waiting for someone to take her place.</p>
+      <p>The carriage is quiet now. The seat across the aisle is empty. But the train still stops at Ashbury at 1:41 every night, and I have started watching the platform, and someday soon somebody will get on, and I will be very polite, and I will ask them which stop.</p>
+    `
+  },
+  {
+    icon: '🪞',
+    tag: 'Cursed Object · 4 min',
+    title: 'What the Mirror Keeps',
+    teaser: 'At first the reflection was half a second late. Then it was half a second early. Then it was waiting.',
+    body: `
+      <p>The mirror came with the house. Six feet of it, framed in black walnut, bolted to the wall at the end of the upstairs hall.</p>
+      <p>I noticed the delay on the second day. I raised my hand and the reflection raised hers a half-second later. I told myself it was the glass, the angle, the light. I tested it for a week. Always a half-second late, like a bad video call.</p>
+      <p>Then it stopped being late.</p>
+      <p>I'd be halfway down the hall before the reflection in the glass had finished turning around. I'd reach for the light switch and my hand in the mirror was already there, waiting, fingers resting on nothing. Once — I was very tired, and I'm still not certain — I saw my reflection blink before I did, and smile a little, as though to say: <em>there you are</em>.</p>
+      <p>I covered it with a bedsheet. In the morning the sheet was folded neatly on the floor, corners squared, the way my mother used to fold things. She has been dead eleven years.</p>
+      <p>I moved a wardrobe in front of it. By Friday the wardrobe was back against the far wall. It is not a heavy wardrobe, but it is not that light either.</p>
+      <p>Last night I woke up and the hallway light was on, and I lay very still and listened to someone walking up and down the corridor with slow, patient steps — the way you walk when you're waiting for someone to finally fall asleep.</p>
+      <p>In the morning I found two things. The first was that the mirror was uncovered.</p>
+      <p>The second was that I couldn't find my reflection anywhere in it.</p>
+      <p>I've been avoiding the hall since then. But I noticed something at breakfast that I can't stop thinking about. When I reached for my coffee, the woman in the toaster's chrome reached at exactly the same time.</p>
+      <p>Exactly.</p>
+      <p>Which means she's getting better at it. Which means it's only a matter of time before she can do the whole day, start to finish, and I will be standing in a glass hallway at the end of the upstairs corridor, half a second behind, mouthing <em>I'm sorry</em> at whoever walks past.</p>
+      <p>Be kind to your reflection. You never know when she'll want a turn.</p>
+    `
+  },
+  {
+    icon: '🪑',
+    tag: 'Family Curse · 4 min',
+    title: 'The Rocking Chair',
+    teaser: 'It only rocks when someone in the family is about to be called home. Last Tuesday, it started again.',
+    body: `
+      <p>My grandmother's rocking chair has rocked by itself for as long as I can remember.</p>
+      <p>Mamaw said it was the house settling. My mother said it was the floorboards. I said nothing, because I had watched it from the stairs for most of my childhood and it did not rock like a house settling. It rocked like someone was sitting in it, pushing off the floor with the balls of their feet, the way she always did — a slow, steady, patient rhythm. The rhythm of a woman waiting for water to boil.</p>
+      <p>When my brother got sick, it stopped. Six weeks of absolute stillness, the first quiet our house had known in years, and we were so grateful that we didn't understand what it meant until the night he died and it started again.</p>
+      <p>It rocked for nine days before my mother's accident. It rocked for three before the fire. It rocked for a month before the year I lost my job, my marriage, and the house, all at once, and afterward I sat on the floor in front of it and asked it, out loud, like a fool, "Can't you give me a break?"</p>
+      <p>It stopped for a year. That was the best year of my life.</p>
+      <p>I know how it sounds. I know. But I have lived with it long enough to know what it is. It is not a warning. It is not a monster. It is my grandmother, who loved us, sitting in her chair and rocking the way she always did when one of us was about to be called home — because she was not allowed to tell us, and rocking was the only thing she was still permitted to do.</p>
+      <p>Last Tuesday it started again.</p>
+      <p>It has not stopped since. Nine days now. I've been sleeping in the car.</p>
+      <p>This morning I noticed something I had never noticed before, in all those years.</p>
+      <p>The chair doesn't rock toward the window anymore.</p>
+      <p>It rocks toward the door.</p>
+    `
+  }
+];
+
+/* ============================================================
+   BUILD STORY CARDS
+   ============================================================ */
+const grid = document.getElementById('storyGrid');
+
+stories.forEach((s, i) => {
+  const card = document.createElement('article');
+  card.className = 'card reveal';
+  card.setAttribute('tabindex', '0');
+  card.setAttribute('role', 'button');
+  card.setAttribute('aria-label', 'Read: ' + s.title);
+  card.innerHTML = `
+    <span class="card__icon" aria-hidden="true">${s.icon}</span>
+    <p class="card__tag">${s.tag}</p>
+    <h3 class="card__title">${s.title}</h3>
+    <p class="card__teaser">${s.teaser}</p>
+    <span class="card__cta">Read the tale <span aria-hidden="true">→</span></span>
+  `;
+  const open = () => openStory(i);
+  card.addEventListener('click', open);
+  card.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+  });
+  grid.appendChild(card);
+});
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+const modal      = document.getElementById('modal');
+const modalTitle = document.getElementById('modalTitle');
+const modalTag   = document.getElementById('modalTag');
+const modalBody  = document.getElementById('modalBody');
+const modalClose = document.getElementById('modalClose');
+let lastFocused = null;
+
+function openStory(i) {
+  const s = stories[i];
+  lastFocused = document.activeElement;
+  modalTitle.textContent = s.title;
+  modalTag.textContent = s.tag;
+  modalBody.innerHTML = s.body;
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  modalClose.focus();
+  modal.querySelector('.modal__box').scrollTop = 0;
+}
+
+function closeModal() {
+  modal.classList.remove('open');
+  document.body.style.overflow = '';
+  if (lastFocused) lastFocused.focus();
+}
+
+modalClose.addEventListener('click', closeModal);
+modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+});
+
+/* ============================================================
+   WHISPERS
+   ============================================================ */
+const whispers = [
+  'The walls have been counting your footsteps.',
+  'You turned the light off. Something turned it back on.',
+  'There is a room in your home you have never opened. It has been opened.',
+  'Your reflection blinked first.',
+  'It has been standing behind you for eleven minutes. Do not turn around yet.',
+  'The floorboards remember everyone who has walked on them. They are asking about you.',
+  'Something borrowed your name and hasn\u2019t given it back.',
+  'Every photograph of you has one extra person. They are getting closer to the front.',
+  'The dog won\u2019t go in the hallway. The dog is right.',
+  'You heard the knock. You\u2019ve been hearing it for years. Tonight, answer it.',
+  'The candle went out. That was not the wind.',
+  'Somebody has been sleeping in your bed. You have been sleeping on the floor. You just don\u2019t remember.',
+  'There are handprints on the inside of your window. They\u2019re at your height now.',
+  'The clock in the hall stopped at 3:14. It still ticks.',
+  'You are not the first person to read this page tonight.',
+  'The mirror is doing what you do, a little late. Lately it\u2019s been early.',
+  'Do not close the tab. It is already in the room.',
+  'The door was open before you knocked. It has been waiting.'
+];
+
+const whisperText = document.getElementById('whisperText');
+const whisperBtn  = document.getElementById('whisperBtn');
+let lastWhisper = 0;
+
+whisperBtn.addEventListener('click', () => {
+  let idx;
+  do { idx = Math.floor(Math.random() * whispers.length); }
+  while (idx === lastWhisper && whispers.length > 1);
+  lastWhisper = idx;
+
+  whisperText.classList.remove('speaking');
+  void whisperText.offsetWidth;
+  whisperText.textContent = whispers[idx];
+  whisperText.classList.add('speaking');
+});
+
+/* ============================================================
+   KNOCK THREE TIMES
+   ============================================================ */
+const doorFrame = document.getElementById('doorFrame');
+const doorLeaf  = document.getElementById('doorLeaf');
+const doorHint  = document.getElementById('doorHint');
+let knocks = 0;
+let doorOpen = false;
+
+function knock() {
+  if (doorOpen) {
+    doorOpen = false;
+    knocks = 0;
+    doorFrame.classList.remove('open');
+    doorHint.textContent = 'Knock (0 / 3)';
+    doorHint.classList.remove('done');
+    return;
+  }
+
+  knocks++;
+  if (soundOn) playKnockSound();
+
+  doorLeaf.classList.remove('shake');
+  void doorLeaf.offsetWidth;
+  doorLeaf.classList.add('shake');
+
+  doorHint.textContent = `Knock (${knocks} / 3)`;
+
+  if (knocks >= 3) {
+    doorOpen = true;
+    doorFrame.classList.add('open');
+    doorHint.textContent = 'It opened.';
+    doorHint.classList.add('done');
+  }
+}
+
+doorFrame.addEventListener('click', knock);
+doorFrame.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); knock(); }
+});
+
+/* ============================================================
+   PEEKING EYES
+   ============================================================ */
+const peekEyes = document.getElementById('peekEyes');
+const eyeCount = window.innerWidth < 640 ? 7 : 12;
+
+for (let i = 0; i < eyeCount; i++) {
+  const eye = document.createElement('span');
+  eye.className = 'peek-eye';
+  eye.style.left = Math.random() * 94 + '%';
+  eye.style.top = Math.random() * 92 + '%';
+  eye.style.setProperty('--dur', (8 + Math.random() * 14).toFixed(1) + 's');
+  eye.style.setProperty('--delay', (-Math.random() * 20).toFixed(1) + 's');
+  peekEyes.appendChild(eye);
+}
+
+/* ============================================================
+   STARFIELD
+   ============================================================ */
+const starField = document.getElementById('stars');
+const starCount = window.innerWidth < 640 ? 55 : 110;
+for (let i = 0; i < starCount; i++) {
+  const s = document.createElement('span');
+  s.className = 'star';
+  s.style.left = Math.random() * 100 + '%';
+  s.style.top = Math.random() * 85 + '%';
+  s.style.setProperty('--t', (2.5 + Math.random() * 4).toFixed(2) + 's');
+  s.style.setProperty('--d', (Math.random() * 5).toFixed(2) + 's');
+  const size = Math.random() < 0.15 ? 3 : 2;
+  s.style.width = s.style.height = size + 'px';
+  starField.appendChild(s);
+}
+
+/* ============================================================
+   BATS
+   ============================================================ */
+const batField = document.getElementById('bats');
+const batSVG = `<svg viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
+  <path d="M50 26C43 9 22 3 5 13c10 2 12 10 8 18 12-4 22 2 37 14 15-12 25-18 37-14-4-8-2-16 8-18C78 3 57 9 50 26Z" fill="#0d0618"/>
+</svg>`;
+const batCount = window.innerWidth < 640 ? 4 : 7;
+
+for (let i = 0; i < batCount; i++) {
+  const b = document.createElement('div');
+  b.className = 'bat';
+  b.innerHTML = batSVG;
+  b.style.setProperty('--top', (4 + Math.random() * 55) + 'vh');
+  b.style.setProperty('--dur', (22 + Math.random() * 26).toFixed(1) + 's');
+  b.style.setProperty('--delay', (-Math.random() * 30).toFixed(1) + 's');
+  b.style.setProperty('--scale', (0.55 + Math.random() * 0.85).toFixed(2));
+  b.style.animationDirection = Math.random() < 0.25 ? 'reverse' : 'normal';
+  batField.appendChild(b);
+}
+
+/* ============================================================
+   SCROLL REVEAL
+   ============================================================ */
+const revealEls = document.querySelectorAll('[data-reveal]');
+revealEls.forEach(el => el.classList.add('reveal'));
+
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+revealEls.forEach(el => revealObserver.observe(el));
+document.querySelectorAll('.card').forEach(el => revealObserver.observe(el));
+
+/* ============================================================
+   SPOOKY AUDIO + HEARTBEAT
+   ============================================================ */
+const soundToggle = document.getElementById('soundToggle');
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+let audioCtx = null;
+let droneGain = null;
+let soundOn = false;
+let heartbeatTimer = null;
+
+function ensureAudioCtx() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function buildDrone() {
+  ensureAudioCtx();
+
+  droneGain = audioCtx.createGain();
+  droneGain.gain.value = 0;
+  droneGain.connect(audioCtx.destination);
+
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.value = 260;
+  filter.Q.value = 6;
+  filter.connect(droneGain);
+
+  const oscA = audioCtx.createOscillator();
+  oscA.type = 'sawtooth';
+  oscA.frequency.value = 55;
+
+  const oscB = audioCtx.createOscillator();
+  oscB.type = 'sine';
+  oscB.frequency.value = 82.7;
+
+  const gainA = audioCtx.createGain();
+  gainA.gain.value = 0.28;
+  const gainB = audioCtx.createGain();
+  gainB.gain.value = 0.45;
+
+  oscA.connect(gainA).connect(filter);
+  oscB.connect(gainB).connect(filter);
+
+  const lfo = audioCtx.createOscillator();
+  lfo.type = 'sine';
+  lfo.frequency.value = 0.06;
+  const lfoGain = audioCtx.createGain();
+  lfoGain.gain.value = 140;
+  lfo.connect(lfoGain).connect(filter.frequency);
+
+  oscA.start();
+  oscB.start();
+  lfo.start();
+}
+
+function playHeartbeat() {
+  if (!audioCtx || !soundOn) return;
+  const t = audioCtx.currentTime;
+
+  [0, 0.18].forEach((offset, i) => {
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(48, t + offset);
+    osc.frequency.exponentialRampToValueAtTime(28, t + offset + 0.12);
+    g.gain.setValueAtTime(0.0001, t + offset);
+    g.gain.exponentialRampToValueAtTime(i ? 0.035 : 0.055, t + offset + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + offset + 0.16);
+    osc.connect(g).connect(audioCtx.destination);
+    osc.start(t + offset);
+    osc.stop(t + offset + 0.2);
+  });
+}
+
+function startHeartbeat() {
+  if (heartbeatTimer) return;
+  heartbeatTimer = setInterval(playHeartbeat, 1500);
+}
+
+function stopHeartbeat() {
+  clearInterval(heartbeatTimer);
+  heartbeatTimer = null;
+}
+
+function playKnockSound() {
+  try {
+    ensureAudioCtx();
+    const t = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(120, t);
+    osc.frequency.exponentialRampToValueAtTime(45, t + 0.12);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.22, t + 0.005);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+    osc.connect(g).connect(audioCtx.destination);
+    osc.start(t);
+    osc.stop(t + 0.2);
+  } catch (err) { /* audio unavailable */ }
+}
+
+soundToggle.addEventListener('click', () => {
+  try {
+    if (!droneGain) buildDrone();
+
+    soundOn = !soundOn;
+    const now = audioCtx.currentTime;
+    droneGain.gain.cancelScheduledValues(now);
+    droneGain.gain.setTargetAtTime(soundOn ? 0.09 : 0.0001, now, 1.2);
+
+    if (soundOn) startHeartbeat();
+    else stopHeartbeat();
+
+    soundToggle.classList.toggle('on', soundOn);
+    soundToggle.setAttribute('aria-pressed', String(soundOn));
+    soundToggle.textContent = soundOn ? '🔊 Ambience On' : '🔇 Ambience';
+  } catch (err) {
+    soundToggle.textContent = '🔇 Unavailable';
+  }
+});
+
+/* ============================================================
+   RANDOM SPOOK EVENTS
+   ============================================================ */
+const toast = document.getElementById('spookToast');
+const spookMessages = [
+  'You are not alone.',
+  'Do not turn around.',
+  'It is standing behind you.',
+  'The door was already open.',
+  'We see you.',
+  'The light is about to go out.',
+  'Something just moved in the hallway.',
+  'You brought something home with you.'
+];
+
+function showSpookMessage(msg) {
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toast._hideTimer);
+  toast._hideTimer = setTimeout(() => toast.classList.remove('show'), 4200);
+}
+
+function triggerSpook() {
+  if (prefersReducedMotion || document.hidden) return;
+
+  document.body.classList.remove('spook-flash');
+  void document.body.offsetWidth;
+  document.body.classList.add('spook-flash');
+  setTimeout(() => document.body.classList.remove('spook-flash'), 900);
+
+  if (Math.random() < 0.8) {
+    showSpookMessage(spookMessages[Math.floor(Math.random() * spookMessages.length)]);
+  }
+
+  if (!doorOpen) {
+    doorLeaf.classList.remove('shake');
+    void doorLeaf.offsetWidth;
+    doorLeaf.classList.add('shake');
+  }
+}
+
+function scheduleSpook() {
+  const delay = 45000 + Math.random() * 45000;
+  setTimeout(() => {
+    triggerSpook();
+    scheduleSpook();
+  }, delay);
+}
+
+if (!prefersReducedMotion) {
+  setTimeout(() => {
+    triggerSpook();
+    scheduleSpook();
+  }, 25000);
+}
+</script>
+</body>
+</html>
